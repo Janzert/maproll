@@ -273,52 +273,6 @@ class RerollControl {
     }
   }
 
-  FindButtonManPosition() {
-    default_color := "0x8E8E8E"
-    active_color := "0xE39827"
-    border_color := "0x313031"
-    checks := [[382, 42, 38, 400],
-              [515, 57, 52, 538],
-              [637, 71, 64, 665],
-              [768, 85, 77, 801],
-              [892, 100, 90, 938],
-              [1032, 115, 104, 1077],
-              ]
-    MouseGetPos(&mstart_x, &mstart_y)
-    cur_x := mstart_x
-    cur_y := mstart_y
-    result := false
-    for ix, spot in checks {
-      if (cur_x > spot[1] - 30 and cur_x < spot[1] + 30
-          and cur_y > spot[2] - 30 and cur_y < spot[2] + 30) {
-        MouseMove(0, 0)
-        cur_x := 0
-        cur_y := 0
-        Sleep(100)
-      }
-      if (PixelGetColor(spot[1], spot[3]) == default_color
-          and PixelGetColor(spot[4], spot[3]) == border_color
-          and PixelGetColor(spot[4] + 1, spot[3] + 1) == border_color) {
-        MouseMove(spot[1], spot[2])
-        cur_x := spot[1]
-        cur_y := spot[2]
-        Sleep(100)
-        if (PixelGetColor(spot[1], spot[3]) == active_color) {
-          if (result != false) {
-            MsgBox("Found multiple possible reroll button locations",
-                "Warning", "OK")
-          }
-          result := ix
-        }
-      }
-    }
-    MouseMove(mstart_x, mstart_y)
-    if (result == false) {
-      throw MyError("Could not find reroll button location.")
-    }
-    return [checks[result][1], checks[result][2]]
-  }
-
   FindButton() {
     default_color := "0x8E8E8E"
     inter_color := "0x242324"
