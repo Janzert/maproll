@@ -366,13 +366,11 @@ class RerollControl {
       return
     }
     try {
-      MouseGetPos(&mstart_x, &mstart_y)
       pos := this.FindButton()
       this.livesplit.Reset()
       this.livesplit.Start()
       Sleep 50
       Click(pos[1], pos[2])
-      MouseMove(mstart_x, mstart_y)
     } catch MyError as err {
       MsgBox(err.Message, "Error", "OK")
     }
