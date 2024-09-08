@@ -13,22 +13,40 @@ class MyError extends Error {
 }
 
 class LocalLivesplit {
+  static debounce_delay := 305
+
   __New(settings) {
     this.reset_key := this.PrepKeys(settings.livesplit_local_reset)
     this.start_key := this.PrepKeys(settings.livesplit_local_start)
+    this.last_send := A_TickCount
   }
 
   PrepKeys(hotkey) {
     return RegExReplace(hotkey, "([#!^+<>]*)([\w]{2,})", "$1{$2}")
   }
 
+  Delay() {
+    delay := LocalLivesplit.debounce_delay
+    next_send := this.last_send + delay
+    now := A_TickCount
+    if (now < next_send) {
+      wait := next_send - now
+      wait := wait < delay ? wait : delay
+      wait := wait > 0 ? wait : 0
+      Sleep(wait)
+    }
+  }
+
   Reset() {
+    this.Delay()
     Send this.reset_key
-    Sleep 400
+    this.last_send := A_TickCount
   }
 
   Start() {
+    this.Delay()
     Send this.start_key
+    this.last_send := A_TickCount
   }
 }
 
@@ -369,7 +387,6 @@ class RerollControl {
       pos := this.FindButton()
       this.livesplit.Reset()
       this.livesplit.Start()
-      Sleep 50
       Click(pos[1], pos[2])
     } catch MyError as err {
       MsgBox(err.Message, "Error", "OK")
