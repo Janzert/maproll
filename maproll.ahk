@@ -88,7 +88,7 @@ class SettingStore {
   static registry_key := "HKCU\Software\FactorioRoller"
 
   reroll_key := "F12"
-  livesplit_location := "Local"
+  livesplit_method := "Keyboard"
   livesplit_local_reset := "^!Numpad3"
   livesplit_local_start := "Numpad1"
   livesplit_network_host := ""
@@ -96,8 +96,14 @@ class SettingStore {
 
   Load() {
     this.reroll_key := RegRead(SettingStore.registry_key, "reroll_key", "F12")
-    this.livesplit_location := RegRead(SettingStore.registry_key,
-        "livesplit_location", "Local")
+    stored_method := RegRead(SettingStore.registry_key,
+        "livesplit_method", "Keyboard")
+    for check in ["Keyboard", "TCP"] {
+      if (stored_method == check) {
+        this.livesplit_method := stored_method
+        break
+      }
+    }
     this.livesplit_local_reset := RegRead(SettingStore.registry_key,
         "livesplit_local_reset", "!^{Numpad3}")
     this.livesplit_local_start := RegRead(SettingStore.registry_key,
@@ -110,8 +116,8 @@ class SettingStore {
 
   Save() {
     RegWrite(this.reroll_key, "REG_SZ", SettingStore.registry_key, "reroll_key")
-    RegWrite(this.livesplit_location, "REG_SZ", SettingStore.registry_key,
-        "livesplit_location")
+    RegWrite(this.livesplit_method, "REG_SZ", SettingStore.registry_key,
+        "livesplit_method")
     RegWrite(this.livesplit_local_reset, "REG_SZ", SettingStore.registry_key,
         "livesplit_local_reset")
     RegWrite(this.livesplit_local_start, "REG_SZ", SettingStore.registry_key,
@@ -134,11 +140,11 @@ class SettingGUI {
     this.window.AddText("YM+6", "Reroll hotkey:")
     hk_ctrl := this.window.AddHotkey("vreroll_key X+10 YM+0", settings.reroll_key)
     hk_ctrl.OnEvent("Change", "OnChange")
-    this.window.AddText("Section XM+0 Y+10", "Livesplit location:")
-    locationix := settings.livesplit_location == "Network" ? 2 : 1
+    this.window.AddText("Section XM+0 Y+10", "Livesplit control method:")
+    method_ix := settings.livesplit_method == "TCP" ? 2 : 1
     loc_ctrl := this.window.AddDDL(
-      "vlivesplit_location X+10 YS-4 Choose" . locationix,
-      ["Local", "Network"]
+      "vlivesplit_method X+10 YS-4 Choose" . method_ix,
+      ["Keyboard", "TCP"]
     )
     loc_ctrl.OnEvent("Change", "OnChange")
     lsr_text := this.window.AddText("Section XM+0 Y+10", "Livesplit reset key:")
@@ -170,7 +176,7 @@ class SettingGUI {
 
   SetCtrlAvailability() {
     local_enabled := True
-    if this.settings.livesplit_location == "Network" {
+    if this.settings.livesplit_method == "TCP" {
       local_enabled := False
     }
     for ctrl in this.local_options {
@@ -213,9 +219,9 @@ class SettingGUI {
           this.reroll_control.UpdateHotkey()
           valid_change := True
         }
-      Case "livesplit_location":
-        if (this.settings.livesplit_location != ctrl.Text) {
-          this.settings.livesplit_location := ctrl.Text
+      Case "livesplit_method":
+        if (this.settings.livesplit_method != ctrl.Text) {
+          this.settings.livesplit_method := ctrl.Text
           this.SetCtrlAvailability()
           this.reroll_control.UpdateLivesplit()
           valid_change := True
@@ -274,13 +280,13 @@ class RerollControl {
   }
 
   UpdateLivesplit() {
-    Switch(this.settings.livesplit_location) {
-      Case "Local":
+    Switch(this.settings.livesplit_method) {
+      Case "Keyboard":
         this.livesplit := LocalLivesplit(this.settings)
-      Case "Network":
+      Case "TCP":
         this.livesplit := NetworkLivesplit(this.settings)
       Default:
-        throw ValueError("Unknown livesplit location: " . settings.livesplit_location)
+        throw ValueError("Unknown livesplit control method: " . settings.livesplit_method)
     }
   }
 
