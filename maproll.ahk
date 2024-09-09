@@ -161,6 +161,10 @@ class SettingGUI {
     lsp_ctrl.OnEvent("Change", "OnChange")
     this.local_options := [lsr_text, lsr_ctrl, lss_text, lss_ctrl]
     this.network_options := [lsip_text, lsip_ctrl, lsp_text, lsp_ctrl]
+
+    this.test_button := this.window.AddButton("vlivesplit_test Center", "Test livesplit")
+    this.test_button.OnEvent("Click", "OnClick")
+    this.window.AddText("XM+0 Center", "The test will start livesplit and then reset it after 5 seconds.")
     this.SetCtrlAvailability()
   }
 
@@ -181,6 +185,7 @@ class SettingGUI {
 
   Show() {
     this.window.Show()
+    this.test_button.Focus()
   }
 
   Close(guiobj) {
@@ -252,6 +257,10 @@ class SettingGUI {
     if (valid_change) {
       SetTimer(this.save_func, 750)
     }
+  }
+
+  OnClick(ctrl, info) {
+    SetTimer(ObjBindMethod(this.reroll_control, "RunTest"), -1)
   }
 }
 
@@ -375,6 +384,18 @@ class RerollControl {
     }
     MouseMove(mstart_x, mstart_y)
     return [reroll_left + half, reroll_top + half]
+  }
+
+  RunTest() {
+    try {
+      livesplit := this.livesplit
+      livesplit.Reset()
+      livesplit.Start()
+      Sleep(5000)
+      livesplit.Reset()
+    } catch MyError as err {
+      Msgbox(err.Message, "Error", "OK")
+    }
   }
 
   TriggerReroll() {
