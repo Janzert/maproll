@@ -1,0 +1,12 @@
+# Factorio Map Roller
+
+A small script for rerolling maps and starting Livesplit in Factorio random seed speedruns.
+
+Instead of using a static location for the reroll button it has a simple system to find the button automatically. This allows it to adjust for any UI scale and screen resolution. While also stopping accidentally triggering, and resetting Liveplit, while outside of the map preview.
+
+Has the ability to control Livesplit with either hotkeys or TCP network connection.
+
+!(./screenshot_keyboard.png)
+
+!(./screenshot_tcp.png)
+
