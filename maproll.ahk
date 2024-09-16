@@ -170,7 +170,7 @@ class SettingGUI {
 
     this.test_button := this.window.AddButton("vlivesplit_test Center", "Test livesplit")
     this.test_button.OnEvent("Click", "OnClick")
-    this.window.AddText("XM+0 Center", "The test will start livesplit and then reset it after 5 seconds.")
+    this.window.AddText("XM+0 Center", "Test will start livesplit timer and then reset it after 5 seconds.")
     this.SetCtrlAvailability()
   }
 
@@ -425,7 +425,20 @@ class RerollControl {
   }
 }
 
-TraySetIcon("maproll.ico")
+#SingleInstance Force
+A_ScriptName := "Factorio Map Roller"
+A_IconTip := "Factorio Map Roller"
+try {
+  TraySetIcon("maproll.ico")
+} catch Error as err {
+  if (err.Message != "Can't load icon.") {
+   throw err
+  }
+}
+if (A_IsCompiled) {
+  A_IconHidden := 1
+}
+
 settings := SettingStore()
 settings.Load()
 reroller := RerollControl(settings)
