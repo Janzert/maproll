@@ -326,12 +326,39 @@ class RerollControl {
       mcur_y := 0
       Sleep 100
     }
-    if (!PixelSearch(&maptype_left, &maptype_top,
-                    0, 0,
-                    start_width, start_height,
-                    default_color)) {
+
+    maptype_found := false
+    search_y := 0
+    while (search_y < start_height and !maptype_found) {
+      search_x := 0
+      while (search_x < start_width) {
+        if (search_x == 0) {
+          search_bottom := start_height
+        } else {
+          search_bottom := search_y
+        }
+        if (PixelSearch(&maptype_left, &maptype_top,
+                        search_x, search_y,
+                        start_width, search_bottom,
+                        default_color)) {
+          if (PixelGetColor(maptype_left + 1, maptype_top) == default_color
+              and PixelGetColor(maptype_left, maptype_top + 1) == default_color) {
+              maptype_found := true
+              break
+          }
+          search_x := maptype_left + 1
+          search_y := maptype_top
+        } else {
+          search_y := search_bottom
+          break
+        }
+      }
+      search_y += 1
+    }
+    if (!maptype_found) {
       throw MyError("Could not find reroll button location`n`n{type_topleft}")
     }
+
     right_limit := maptype_left + (win_width * 0.5)
     if (!PixelSearch(&inter_x, &inter_y,
                     maptype_left, maptype_top,
