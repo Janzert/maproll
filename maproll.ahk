@@ -438,10 +438,12 @@ class RerollControl {
       return
     }
     try {
-      pos := this.FindButton()
+      button_pos := this.FindButton()
       this.livesplit.Reset()
       this.livesplit.Start()
-      Click(pos[1], pos[2])
+      MouseGetPos(&mstart_x, &mstart_y)
+      Click(button_pos[1], button_pos[2])
+      MouseMove(mstart_x, mstart_y)
     } catch MyError as err {
       MsgBox(err.Message, "Error", "OK")
     }
