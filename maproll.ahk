@@ -1,7 +1,7 @@
 /**
  * @description Small app to reset livesplit timer while rerolling factorio map
  * @author janzert
- * @version 1.0
+ * @version 0.2
  */
 
 #Requires AutoHotkey v2.0
